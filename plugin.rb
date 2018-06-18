@@ -8,34 +8,49 @@ enabled_site_setting :random_assign_enabled
 require 'nokogiri'
 
 after_initialize do
-    before do
-        SiteSetting.enable_whispers = true
-    end
-    
     DiscourseEvent.on(:post_created) do |post|
-        hasUpdated = false
-        post_html = Nokogiri::HTML(post.raw)
-        links = []
-        @restricted_file_types = SiteSetting.file_attachment_whispers_file_extensions.split('|')
-        post_html.search('a').each do |attachment|
-            does_contain = @restricted_file_types.any? {
-                |extension| attachment['href'].include?(extension)
-            }
+        if post.post_type != 4
+            hasUpdated = false
+            post_html = Nokogiri::HTML(post.raw)
+            links = []
+            @restricted_file_types = SiteSetting.file_attachment_whispers_file_extensions.split('|')
+            post_html.search('a').each do |attachment|
+                does_contain = @restricted_file_types.any? {
+                    |extension| attachment['href'].include?(extension)
+                }
 
-            if contains_restricted?(attachment)
-                links.push(attachment)
-                node = post_html.create_element 'p'# create paragraph element
-                node.inner_html = SiteSetting.file_attachment_whispers_message
-                attachment.replace '[color=red]' + node + '[/color]' # replace found link with paragraph
-                post.raw = post_html
-                post.save!
-                hasUpdated = true
+                if contains_restricted?(attachment)
+                    links.push(attachment)
+                    node = post_html.create_element 'p'# create paragraph element
+                    node.inner_html = SiteSetting.file_attachment_whispers_message
+                    attachment.replace '[color=red]' + node + '[/color]' # replace found link with paragraph
+                    post.raw = post_html
+                    post.save!
+                    hasUpdated = true
+                end
             end
-        end
 
-        if hasUpdated 
-            post.raw = post.cooked
-            post.save!
+            if hasUpdated 
+                post.raw = post.cooked
+                post.save!
+
+                if SiteSetting.file_attachment_whispers_notify
+                    if links.length > 0
+                        message = ""
+                        links.each_with_index do |link, i|
+                            message = message + "Link #" + (i + 1).to_s + '<br>' + link.to_s + "<br><br>"
+                        end
+                        new_post = PostCreator.create!(
+                            Discourse.system_user,
+                            topic_id: post.topic.id,
+                            post_type: Post.types[:whisper],
+                            raw: message,
+                            whisper: true,
+                            skip_validations: true
+                        )
+                    end
+                end
+            end
         end
     end
 

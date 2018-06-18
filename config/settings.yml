@@ -8,3 +8,5 @@ plugins:
   file_attachment_whispers_message:
     default: 'MOVED TO STAFF NOTE'
     client: true
+  file_attachment_whispers_notify:
+    default: true

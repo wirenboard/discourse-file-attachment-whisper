@@ -3,3 +3,4 @@ en:
     file_attachment_whispers_enabled: "Enable to remove restricted file types from a post and move to a whisper"
     file_attachment_whispers_file_extensions: "List of extensions to extract from a post"
     file_attachment_whispers_message: "Message to display in a topic upon removal"
+    file_attachment_whispers_notify: "Enable to add a whisper with the extracted files"
