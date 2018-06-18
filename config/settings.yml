@@ -1,0 +1,10 @@
+plugins:
+  file_attachment_whispers_enabled:
+    default: false
+    client: true
+  file_attachment_whispers_file_extensions:
+    type: 'list'
+    default: 'none'
+  file_attachment_whispers_message:
+    default: 'MOVED TO STAFF NOTE'
+    client: true
