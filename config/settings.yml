@@ -10,3 +10,5 @@ plugins:
     client: true
   file_attachment_whispers_notify:
     default: true
+  file_attachment_whispers_staff_bypass:
+    default: true

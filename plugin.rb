@@ -4,16 +4,36 @@
 # authors: Jordan Seanor
 # url: https://github.com/HMSAB/discourse-file-attachment-whisper.git
 
-enabled_site_setting :random_assign_enabled
+enabled_site_setting :file_attachment_whispers_file_extensions
 require 'nokogiri'
 
 after_initialize do
     DiscourseEvent.on(:post_created) do |post|
-        review_post(post)
+        if SiteSetting.file_attachment_whispers_file_extensions
+            if SiteSetting.file_attachment_whispers_staff_bypass
+                user = User.find_by(id: post.user_id)
+                if user.staff?
+                else
+                    review_post(post)
+                end
+            else
+                review_post(post)
+            end
+        end
     end
 
     DiscourseEvent.on(:post_edited) do |post|
-        review_post(post)
+        if SiteSetting.file_attachment_whispers_file_extensions
+            if SiteSetting.file_attachment_whispers_staff_bypass
+                user = User.find_by(id: post.user_id)
+                if user.staff?
+                else
+                    review_post(post)
+                end
+            else
+                review_post(post)
+            end
+        end
     end
 
     def review_post(post)
