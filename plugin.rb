@@ -9,6 +9,14 @@ require 'nokogiri'
 
 after_initialize do
     DiscourseEvent.on(:post_created) do |post|
+        review_post(post)
+    end
+
+    DiscourseEvent.on(:post_edited) do |post|
+        review_post(post)
+    end
+
+    def review_post(post)
         if post.post_type != 4
             hasUpdated = false
             post_html = Nokogiri::HTML(post.raw)
