@@ -39,7 +39,7 @@ after_initialize do
     def review_post(post)
         if post.post_type != 4
             hasUpdated = false
-            post_html = Nokogiri::HTML(post.raw)
+            post_html = Nokogiri::HTML(post.cooked)
             links = []
             @restricted_file_types = SiteSetting.file_attachment_whispers_file_extensions.split('|')
             post_html.search('a').each do |attachment|
@@ -52,7 +52,7 @@ after_initialize do
                     node = post_html.create_element 'p'# create paragraph element
                     node.inner_html = SiteSetting.file_attachment_whispers_message
                     attachment.replace '[color=red]' + node + '[/color]' # replace found link with paragraph
-                    post.raw = post_html
+                    post.cooked = post_html
                     post.save!
                     hasUpdated = true
                 end
