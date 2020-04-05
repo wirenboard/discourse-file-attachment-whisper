@@ -59,7 +59,8 @@ after_initialize do
             end
 
             if hasUpdated 
-                post.raw = post.cooked
+                updated_raw = ActionView::Base.full_sanitizer.sanitize(post.cooked)
+                post.raw = updated_raw
                 post.save!
 
                 if SiteSetting.file_attachment_whispers_notify
