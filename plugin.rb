@@ -52,7 +52,19 @@ after_initialize do
                     node = post_html.create_element 'p'# create paragraph element
                     node.inner_html = SiteSetting.file_attachment_whispers_message
                     attachment.replace '<font color="red">' + node + '</font>'
-                    post.cooked = post_html
+
+                    # remove extra tags nokogiri adds in
+                    index1 = post_html.to_s.index('body')
+                    index2 = post_html.to_s.index('/body')
+                    front_extra_characters = 5
+                    back_extra_characters = 2
+
+                    index1 = index1 + front_extra_characters
+                    index2 = index2 - back_extra_characters
+
+                    sub_string = post_html.to_s[index1..index2]
+
+                    post.cooked = sub_string
                     post.save!
                     hasUpdated = true
                 end
