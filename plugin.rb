@@ -51,7 +51,7 @@ after_initialize do
                     links.push(attachment)
                     node = post_html.create_element 'p'# create paragraph element
                     node.inner_html = SiteSetting.file_attachment_whispers_message
-                    attachment.replace '[color=red]' + node + '[/color]' # replace found link with paragraph
+                    attachment.replace '<font color="red">' + node + '</font>'
                     post.cooked = post_html
                     post.save!
                     hasUpdated = true
@@ -59,8 +59,7 @@ after_initialize do
             end
 
             if hasUpdated
-                updated_raw = ActionView::Base.full_sanitizer.sanitize(post.cooked)
-                post.raw = updated_raw
+                post.raw = post.cooked
                 post.save!
 
                 if SiteSetting.file_attachment_whispers_notify
