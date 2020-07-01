@@ -58,7 +58,7 @@ after_initialize do
                 end
             end
 
-            if hasUpdated 
+            if hasUpdated
                 updated_raw = ActionView::Base.full_sanitizer.sanitize(post.cooked)
                 post.raw = updated_raw
                 post.save!
