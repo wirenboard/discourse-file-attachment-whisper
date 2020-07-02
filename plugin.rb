@@ -51,16 +51,27 @@ after_initialize do
                     links.push(attachment)
                     node = post_html.create_element 'p'# create paragraph element
                     node.inner_html = SiteSetting.file_attachment_whispers_message
-                    attachment.replace '[color=red]' + node + '[/color]' # replace found link with paragraph
-                    post.cooked = post_html
+                    attachment.replace '<font color="red">' + node + '</font>'
+
+                    # remove extra tags nokogiri adds in
+                    index1 = post_html.to_s.index('body')
+                    index2 = post_html.to_s.index('/body')
+                    front_extra_characters = 5
+                    back_extra_characters = 2
+
+                    index1 = index1 + front_extra_characters
+                    index2 = index2 - back_extra_characters
+
+                    sub_string = post_html.to_s[index1..index2]
+
+                    post.cooked = sub_string
                     post.save!
                     hasUpdated = true
                 end
             end
 
-            if hasUpdated 
-                updated_raw = ActionView::Base.full_sanitizer.sanitize(post.cooked)
-                post.raw = updated_raw
+            if hasUpdated
+                post.raw = post.cooked
                 post.save!
 
                 if SiteSetting.file_attachment_whispers_notify
