@@ -4,12 +4,12 @@
 # authors: Jordan Seanor
 # url: https://github.com/HMSAB/discourse-file-attachment-whisper.git
 
-enabled_site_setting :file_attachment_whispers_file_extensions
+enabled_site_setting :file_attachment_whispers_enabled
 require 'nokogiri'
 
 after_initialize do
     DiscourseEvent.on(:post_created) do |post|
-        if SiteSetting.file_attachment_whispers_file_extensions
+        if SiteSetting.file_attachment_whispers_file_extensions or SiteSetting.file_attachment_whispers_regex
             if SiteSetting.file_attachment_whispers_staff_bypass
                 user = User.find_by(id: post.user_id)
                 if user.staff?
@@ -23,7 +23,7 @@ after_initialize do
     end
 
     DiscourseEvent.on(:post_edited) do |post|
-        if SiteSetting.file_attachment_whispers_file_extensions
+        if SiteSetting.file_attachment_whispers_file_extensions or SiteSetting.file_attachment_whispers_regex
             if SiteSetting.file_attachment_whispers_staff_bypass
                 user = User.find_by(id: post.user_id)
                 if user.staff?
@@ -96,6 +96,15 @@ after_initialize do
 
     def contains_restricted?(attachment)
         @restricted_file_types = SiteSetting.file_attachment_whispers_file_extensions.split('|')
+        if SiteSetting.file_attachment_whispers_regex
+            begin
+                regex = Regexp.new(SiteSetting.file_attachment_whispers_regex)
+                if regex =~ attachment.inner_html
+                    return true
+                end
+            rescue
+            end
+        end
         @restricted_file_types.any? { |extension| attachment['href'].include?(extension)}
     end
 end

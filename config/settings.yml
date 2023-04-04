@@ -4,7 +4,10 @@ plugins:
     client: true
   file_attachment_whispers_file_extensions:
     type: 'list'
-    default: 'none'
+    default: ''
+  file_attachment_whispers_regex:
+    type: 'string'
+    default: ''
   file_attachment_whispers_message:
     default: 'MOVED TO STAFF NOTE'
     client: true
