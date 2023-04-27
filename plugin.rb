@@ -51,7 +51,7 @@ after_initialize do
                     links.push(attachment)
                     node = post_html.create_element 'p'# create paragraph element
                     node.inner_html = SiteSetting.file_attachment_whispers_message
-                    attachment.replace '<font color="red">' + node + '</font>'
+                    attachment.replace '<div class="d-wrap" data-wrap="color" data-color="grey"><i>' + node + '</i></div>'
 
                     # remove extra tags nokogiri adds in
                     index1 = post_html.to_s.index('body')
